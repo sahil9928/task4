@@ -1,58 +1,28 @@
--- Example MySQL schema
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255),
-    email VARCHAR(255) UNIQUE,
-    created_at TIMESTAMP
-);
+mysqldump -u <username> -p<password> <database_name> > <backup_file_name>.sql
 
 
--- Equivalent PostgreSQL schema
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255) UNIQUE,
-    created_at TIMESTAMP
-);
+mysqldump -u root -pMyPassword my_database > backup_my_database.sql
 
 
-sudo apt-get install pgloader
+crontab -e
 
 
-pgloader mysql://user:password@source_db/mydb postgresql://user:password@target_db/mydb
+0 0 * * * mysqldump -u root -pMyPassword my_database > /path/to/backup_directory/backup_my_database_$(date +\%F).sql
 
 
-mysqldump -u user -p --opt --no-create-info mydb > data.sql
+mysql -u <username> -p<password> <database_name> < <backup_file_name>.sql
 
 
-psql -U user -d target_db -f data.sql
+mysql -u root -pMyPassword my_database < backup_my_database.sql
 
 
--- Count rows in MySQL
-SELECT COUNT(*) FROM users;
-
--- Count rows in PostgreSQL
-SELECT COUNT(*) FROM users;
+mysql -u root -pMyPassword -e "DROP DATABASE my_database;"
 
 
--- Check for NULLs in MySQL
-SELECT COUNT(*) FROM users WHERE name IS NULL;
-
--- Check for NULLs in PostgreSQL
-SELECT COUNT(*) FROM users WHERE name IS NULL;
+mysql -u root -pMyPassword -e "CREATE DATABASE my_database;"
 
 
--- Compare data for a sample record
-SELECT * FROM users WHERE id = 1;  -- MySQL query
--- Then do the same in PostgreSQL
-SELECT * FROM users WHERE id = 1;  -- PostgreSQL query
+mysql -u root -pMyPassword my_database < backup_my_database.sql
 
-
--- Check indexes in PostgreSQL
-SELECT * FROM pg_indexes WHERE tablename = 'users';
-
--- Check foreign keys in PostgreSQL
-SELECT conname, conrelid::regclass AS table_name, confrelid::regclass AS reference_table
-FROM pg_constraint WHERE conrelid = 'users'::regclass;
 
 
